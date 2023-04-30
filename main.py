@@ -27,28 +27,20 @@ def main():
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template('template.html')
-    env = Environment(
-        loader=FileSystemLoader('.'),
-        autoescape=select_autoescape(['html', 'xml'])
-    )
     year_work = datetime.now()
     opening_date = datetime.strptime(OPENING_DATE, '%d/%m/%Y')
     age = year_work.year - opening_date.year
-
     wines = pd.read_excel('wine.xlsx', na_values='nan', keep_default_na=False).sort_values(by=['Категория', 'Цена']) \
         .to_dict(orient='records')
     wines_catalog = defaultdict(list)
     for wine in wines:
         wines_catalog[wine['Категория']].append(wine)
-
     rendered_page = template.render(
         year_work_world=get_world_year(age),
         data=wines_catalog,
     )
-
     with open('index.html', 'w', encoding="utf8") as file:
         file.write(rendered_page)
-
     server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
     server.serve_forever()
 
