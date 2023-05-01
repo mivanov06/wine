@@ -10,7 +10,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 def get_world_year(year: int) -> str:
     year_temp = year % 100
-    if 4 <= year_temp <= 20:
+    if 5 <= year_temp <= 20:
         return f'{year} лет'
     year_temp = year_temp % 10
     if year_temp == 1:
@@ -21,7 +21,7 @@ def get_world_year(year: int) -> str:
 
 
 def main():
-    OPENING_DATE = '01/01/1921'
+    OPENING_DATE = '01/01/1919'
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
