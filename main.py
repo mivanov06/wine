@@ -1,3 +1,4 @@
+import argparse
 from collections import defaultdict
 
 import pandas as pd
@@ -20,8 +21,21 @@ def get_world_year(year: int) -> str:
     return f'{year} лет'
 
 
+def parse_argument():
+    parser = argparse.ArgumentParser(
+        description='Сайт магазина авторского вина "Новое русское вино"',
+    )
+    parser.add_argument(
+        '--wine',
+        default='wine_example.xlsx',
+        help='Excel-файл с ассортиментом продукции',
+    )
+    arg = parser.parse_args()
+    return arg.wine
+
+
 def main():
-    OPENING_DATE = '01/01/1919'
+    OPENING_DATE = '01/01/1917'
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -30,8 +44,13 @@ def main():
     year_work = datetime.now()
     opening_date = datetime.strptime(OPENING_DATE, '%d/%m/%Y')
     age = year_work.year - opening_date.year
-    wines = pd.read_excel('wine.xlsx', na_values='nan', keep_default_na=False).sort_values(by=['Категория', 'Цена']) \
-        .to_dict(orient='records')
+    wine_path = parse_argument()
+    try:
+        wines = pd.read_excel(wine_path, na_values='nan', keep_default_na=False).sort_values(by=['Категория', 'Цена']) \
+            .to_dict(orient='records')
+    except FileNotFoundError:
+        print(f'Файл {wine_path} не найден. Проверьте имя файла и перезапустите скрипт')
+        return
     wines_catalog = defaultdict(list)
     for wine in wines:
         wines_catalog[wine['Категория']].append(wine)
